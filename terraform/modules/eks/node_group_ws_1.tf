@@ -1,8 +1,7 @@
-resource "aws_eks_node_group" "webservices-1" {
+resource "aws_eks_node_group" "ws-1" {
   cluster_name    = aws_eks_cluster.this.name
   node_group_name = "ws_1_nodes"
   node_role_arn   = aws_iam_role.eks_node.arn
-  node_group_name_prefix = "ws-1-node-"
 
   // Multiple subnets make sense for example if you want more AZ availabilits. (AZ=Availability Zone by the way)
   subnet_ids      = [var.private_subnet_id]
@@ -51,9 +50,8 @@ resource "aws_eks_node_group" "webservices-1" {
 
   depends_on = [
     aws_iam_role_policy_attachment.eks_worker_policy,
-    aws_iam_role_policy_attachment.eks_vpc_resource_controller,
     aws_iam_role_policy_attachment.ecr_read_policy,
-    aws_laws_launch_template.ws_1_node_template
+    aws_launch_template.ws_1_node_template
   ]
 }
 

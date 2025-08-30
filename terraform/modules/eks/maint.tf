@@ -15,12 +15,13 @@ resource "aws_eks_cluster" "this" {
   }
 
   # Encrypt etcd data at rest, you can optionally add configmaps too but usually it's not necessarry
-  encryption_config {
-    provider {
-      key_arn = aws_kms_key.eks.arn
-    }
-    resources = ["secrets"]
-  }
+  # You have to generate a kms key that kubernetes will use
+  # encryption_config {
+  #   provider {
+  #     key_arn = aws_kms_key.eks.arn
+  #   }
+  #   resources = ["secrets"]
+  # }
 
   # Modern authentication approach
   access_config {
@@ -33,7 +34,6 @@ resource "aws_eks_cluster" "this" {
 
   depends_on = [
     aws_iam_role_policy_attachment.eks_cluster_policy,
-    aws_iam_role_policy_attachment.eks_service_policy
   ]
 }
 
@@ -44,35 +44,6 @@ resource "aws_eks_cluster" "this" {
 # }
 
 
-
-# resource "aws_eks_node_group" "ingress" {
-#   cluster_name    = aws_eks_cluster.this.name
-#   node_group_name = "ingress-nodes"
-#   node_role_arn   = aws_iam_role.eks_node.arn
-#   subnet_ids      = [var.public_subnet_id]
-
-#   scaling_config {
-#     desired_size = 2
-#     max_size     = 3
-#     min_size     = 1
-#   }
-
-#   instance_types = ["t3.medium"]
-
-#   labels = {
-#     "node-type" = "ingress-nodes"
-#   }
-
-#   tags = {
-#     Name = "ingress-nodes"
-#   }
-
-#   depends_on = [
-#     aws_iam_role_policy_attachment.eks_worker_policy,
-#     aws_iam_role_policy_attachment.eks_vpc_resource_controller,
-#     aws_iam_role_policy_attachment.ecr_read_policy
-#   ]
-# }
 
 
 // Automate local kubectl configuration
