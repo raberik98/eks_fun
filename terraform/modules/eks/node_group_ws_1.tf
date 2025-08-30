@@ -4,14 +4,14 @@ resource "aws_eks_node_group" "ws-1" {
   node_role_arn   = aws_iam_role.eks_node.arn
 
   // Multiple subnets make sense for example if you want more AZ availabilits. (AZ=Availability Zone by the way)
-  subnet_ids      = [var.private_subnet_id]
+  subnet_ids = [var.subnet_ids[1]]
 
-  capacity_type  = "ON_DEMAND"
-  
+  capacity_type = "ON_DEMAND"
+
 
   // Use templates for better costumization of your nodes, see bellow.
   launch_template {
-    id = aws_launch_template.ws_1_node_template.id
+    id      = aws_launch_template.ws_1_node_template.id
     version = "$Latest"
   }
 
@@ -33,10 +33,10 @@ resource "aws_eks_node_group" "ws-1" {
   */
   lifecycle {
     ignore_changes = [
-        scaling_config[0].desired_size, 
-        scaling_config[0].max_size, 
-        scaling_config[0].min_size
-        ]
+      scaling_config[0].desired_size,
+      scaling_config[0].max_size,
+      scaling_config[0].min_size
+    ]
   }
 
 
@@ -57,12 +57,29 @@ resource "aws_eks_node_group" "ws-1" {
 
 
 resource "aws_launch_template" "ws_1_node_template" {
-  name_prefix   = "eks-ubuntu-"
+  name          = "eks-ubuntu"
   description   = "Launch template for EKS Ubuntu nodes"
-  image_id      = data.aws_ssm_parameter.eks_ubuntu_ami.value
-  instance_type = "t3.large"  # This can be overridden by node group
-  
+  image_id      = local.ubuntu_image_id
+  instance_type = "t3.xlarge" # This can be overridden by node group
+
+  cpu_options {
+    core_count       = 2
+    threads_per_core = 2
+  }
+
   vpc_security_group_ids = [aws_security_group.eks_nodes.id]
+
+  // False because most pods are going to be stateless so no EBS is needed.
+  ebs_optimized                        = false
+  instance_initiated_shutdown_behavior = "terminate"
+  # monitoring {
+  #   enabled = true
+  # }
+
+  // Only the single point of entry pod EC2 is going to have a public IP address OR a Network Loadbalancer created for it.
+  network_interfaces {
+    associate_public_ip_address = false
+  }
 
   tag_specifications {
     resource_type = "instance"

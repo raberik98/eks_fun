@@ -17,6 +17,10 @@ resource "aws_eks_addon" "kube_proxy" {
   addon_version = "v1.28.15-eksbuild.31"
 }
 
+// Above are the default addons, we can manage them manually with addon_versions fixed for better reproducability
+//---------------------------------------------------------
+
+
 // Predefined service account name "ebs-csi-controller-sa" in namespace "kube-system"
 # resource "aws_eks_addon" "ebs_csi" {
 #   cluster_name             = aws_eks_cluster.this.name

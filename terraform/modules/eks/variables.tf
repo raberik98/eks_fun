@@ -2,15 +2,10 @@ variable "vpc_id" {
   type = string
 }
 
-variable "public_subnet_id" {
-  type = string
+variable "subnet_ids" {
+  description = "The first value should be the public subnet"
+  type = list(string)
 }
-
-variable "private_subnet_id" {
-  type = string
-}
-
-
 
 variable "project_name" {
   type = string
@@ -29,7 +24,15 @@ variable "configure_kubectl" {
   default = true
 }
 
-data "aws_ssm_parameter" "eks_ubuntu_ami" {
-  name = "/aws/service/canonical/ubuntu/eks/22.04/1.29/stable/current/amd64/hvm/ebs-gp2/ami-id"
-  #      /aws/service/canonical/ubuntu/eks/VERSION/K8S_VERSION/stable/current/ARCH/hvm/ebs-gp2/ami-id
+locals {
+  ubuntu_image_id = "ami-04e33358385599285"
+  ubuntu_ami_name = "ubuntu-eks/k8s_1.28/images/hvm-ssd/ubuntu-focal-20.04-arm64-server-20250527"
 }
+
+# Check for any Ubuntu AMIs with EKS in the name
+
+# aws ec2 describe-images \
+#   --owners 099720109477 \
+#   --filters "Name=name,Values=*ubuntu*eks*" \
+#   --query 'Images[*].[ImageId,Name,CreationDate]' \
+#   --output table

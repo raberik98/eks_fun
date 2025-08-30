@@ -10,7 +10,7 @@ resource "aws_eks_cluster" "this" {
   bootstrap_self_managed_addons = false
 
   vpc_config {
-    subnet_ids         = [var.public_subnet_id, var.private_subnet_id]
+    subnet_ids         = var.subnet_ids
     security_group_ids = [aws_security_group.eks_cluster.id]
   }
 
