@@ -2,18 +2,25 @@ resource "aws_eks_node_group" "ws-1" {
   cluster_name    = aws_eks_cluster.this.name
   node_group_name = "ws_1_nodes"
   node_role_arn   = aws_iam_role.eks_node.arn
-
   // Multiple subnets make sense for example if you want more AZ availabilits. (AZ=Availability Zone by the way)
   subnet_ids = [var.subnet_ids[1]]
-
+  instance_types = [ "t3.xlarge" ]
   capacity_type = "ON_DEMAND"
 
 
-  // Use templates for better costumization of your nodes, see bellow.
-  launch_template {
-    id      = aws_launch_template.ws_1_node_template.id
-    version = "$Latest"
+  # Add SSH key directly
+  remote_access {
+    ec2_ssh_key = "your-key-pair-name"  # Your existing key pair name
+    # Optional: restrict SSH access to specific security groups, it makes sense to pass the security group that the bastion host will use
+    // source_security_group_ids = []
   }
+
+
+  // Use templates for better costumization of your nodes, see bellow.
+  # launch_template {
+  #   id      = aws_launch_template.ws_1_node_template.id
+  #   version = "$Latest"
+  # }
 
   scaling_config {
     desired_size = 2
@@ -51,45 +58,51 @@ resource "aws_eks_node_group" "ws-1" {
   depends_on = [
     aws_iam_role_policy_attachment.eks_worker_policy,
     aws_iam_role_policy_attachment.ecr_read_policy,
-    aws_launch_template.ws_1_node_template
+    // aws_launch_template.ws_1_node_template
   ]
 }
 
 
-resource "aws_launch_template" "ws_1_node_template" {
-  name          = "eks-ubuntu"
-  description   = "Launch template for EKS Ubuntu nodes"
-  image_id      = local.ubuntu_image_id
-  instance_type = "t3.xlarge" # This can be overridden by node group
+// In case of a more costume requirement for the underlying EC2 instances you can use a launch_template.
+// It makes sense if you want to use a least known base distro with your own setup like Nixos or to be honest any non aamazon linux distro.
+// Otherwise the base EKS configured AMIs are pretty good and they are already pre-configured.
 
-  cpu_options {
-    core_count       = 2
-    threads_per_core = 2
-  }
+# resource "aws_launch_template" "ws_1_node_template" {
+#   name          = "eks-ubuntu"
+#   description   = "Launch template for EKS Ubuntu nodes"
+#   image_id      = local.ubuntu_image_id
+#   instance_type = "t3.xlarge" # This can be overridden by node group
 
-  vpc_security_group_ids = [aws_security_group.eks_nodes.id]
 
-  // False because most pods are going to be stateless so no EBS is needed.
-  ebs_optimized                        = false
-  instance_initiated_shutdown_behavior = "terminate"
-  # monitoring {
-  #   enabled = true
-  # }
+#   // https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/cpu-options-supported-instances-values.html
+#   cpu_options {
+#     core_count       = 2
+#     threads_per_core = 2
+#   }
 
-  // Only the single point of entry pod EC2 is going to have a public IP address OR a Network Loadbalancer created for it.
-  network_interfaces {
-    associate_public_ip_address = false
-  }
+#   vpc_security_group_ids = [aws_security_group.eks_nodes.id]
 
-  tag_specifications {
-    resource_type = "instance"
-    tags = {
-      Name = "eks-ubuntu-node"
-    }
-  }
+#   // False because most pods are going to be stateless so no EBS is needed.
+#   ebs_optimized                        = false
+#   instance_initiated_shutdown_behavior = "terminate"
+#   # monitoring {
+#   #   enabled = true
+#   # }
 
-  # Important: This ensures nodes can be terminated/replaced
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#   // Only the single point of entry pod EC2 is going to have a public IP address OR a Network Loadbalancer created for it.
+#   network_interfaces {
+#     associate_public_ip_address = false
+#   }
+
+#   tag_specifications {
+#     resource_type = "instance"
+#     tags = {
+#       Name = "eks-ubuntu-node"
+#     }
+#   }
+
+#   # Important: This ensures nodes can be terminated/replaced
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }

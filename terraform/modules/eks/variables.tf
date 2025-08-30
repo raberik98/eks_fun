@@ -25,9 +25,10 @@ variable "configure_kubectl" {
 }
 
 locals {
-  ubuntu_image_id = "ami-04e33358385599285"
-  ubuntu_ami_name = "ubuntu-eks/k8s_1.28/images/hvm-ssd/ubuntu-focal-20.04-arm64-server-20250527"
+  # ubuntu_image_id = "ami-04e33358385599285"
+  # ubuntu_ami_name = "ubuntu-eks/k8s_1.28/images/hvm-ssd/ubuntu-focal-20.04-arm64-server-20250527"
 }
+
 
 # Check for any Ubuntu AMIs with EKS in the name
 
