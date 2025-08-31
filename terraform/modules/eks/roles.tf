@@ -6,7 +6,6 @@ resource "aws_iam_role" "eks_cluster" {
     Statement = [
       { 
         Action = [
-        "sts:AssumeRole",
         "sts:TagSession"
         ]
         Effect = "Allow"
@@ -66,10 +65,10 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
 }
 
 // Depricated
-# resource "aws_iam_role_policy_attachment" "eks_service_policy" {
-#   role       = aws_iam_role.eks_cluster.name
-#   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
-# }
+resource "aws_iam_role_policy_attachment" "eks_service_policy" {
+  role       = aws_iam_role.eks_cluster.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+}
 
 resource "aws_iam_role_policy_attachment" "eks_worker_policy" {
   role       = aws_iam_role.eks_node.name

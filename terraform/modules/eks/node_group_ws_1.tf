@@ -1,6 +1,6 @@
-resource "aws_eks_node_group" "ws-1" {
+resource "aws_eks_node_group" "eks_fun_nodes" {
   cluster_name    = aws_eks_cluster.this.name
-  node_group_name = "ws_1_nodes"
+  node_group_name = "eks_fun_nodes"
   node_role_arn   = aws_iam_role.eks_node.arn
   // Multiple subnets make sense for example if you want more AZ availabilits. (AZ=Availability Zone by the way)
   subnet_ids = [var.subnet_ids[1]]
@@ -9,11 +9,11 @@ resource "aws_eks_node_group" "ws-1" {
 
 
   # Add SSH key directly
-  remote_access {
-    ec2_ssh_key = "your-key-pair-name"  # Your existing key pair name
-    # Optional: restrict SSH access to specific security groups, it makes sense to pass the security group that the bastion host will use
-    // source_security_group_ids = []
-  }
+  # remote_access {
+  #   ec2_ssh_key = "your-key-pair-name"  # Your existing key pair name
+  #   # Optional: restrict SSH access to specific security groups, it makes sense to pass the security group that the bastion host will use
+  #   // source_security_group_ids = []
+  # }
 
 
   // Use templates for better costumization of your nodes, see bellow.
@@ -48,16 +48,17 @@ resource "aws_eks_node_group" "ws-1" {
 
 
   labels = {
-    "node-type" = "ws_1_nodes"
+    "node-type" = "eks_fun_nodes"
   }
 
   tags = {
-    Name = "ws_1_nodes"
+    Name = "eks_fun_nodes"
   }
 
   depends_on = [
     aws_iam_role_policy_attachment.eks_worker_policy,
     aws_iam_role_policy_attachment.ecr_read_policy,
+    aws_iam_role_policy_attachment.eks_cni_policy
     // aws_launch_template.ws_1_node_template
   ]
 }

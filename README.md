@@ -1,4 +1,5 @@
 # Docs and how to check what kind of code you should be producing:
+Press Ctrl + Shift + v in your VSCode
 
 ## [aws_eks_cluster](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_cluster)
 - Don't separate the node_groups from the eks_cluster, keep them tightly coupled
@@ -30,4 +31,15 @@ To get the addon version.
 - Launch templates were specifically made for autoscaling groups for example or for general EC2 usage and it's perfectly compatible with EKS too.
 - Since we are using an EKS optimized AMI, there is no need for a process called **bootstrapping**.
 - **Bootstrapping** is when you attach the created EC2 to the Kuberentes cluster, for EKS optimized images it's already automated for you, otherwise you can do it in a few lines of code, but you have to do it yourself.
+
+Get ubuntu AMI
+```bash
+# Check for any Ubuntu AMIs with EKS in the name
+
+    aws ec2 describe-images \
+    --owners 099720109477 \
+    --filters "Name=name,Values=*ubuntu*eks*" \
+    --query 'Images[*].[ImageId,Name,CreationDate]' \
+    --output table
+```
 

@@ -3,7 +3,7 @@ resource "aws_eks_cluster" "this" {
   role_arn = aws_iam_role.eks_cluster.arn
   // It's a good idea to pin a specific version for better reproducability.
   // aws eks describe-addon-versions --query 'addons[0].addonVersions[0].compatibilities[].clusterVersion' --output text
-  version = "1.28"
+  version = "1.33"
 
   // Default is true, it determines if you want EKS to install aws-cni, kube-proxy, and CoreDNS by default or if you want to do so manually
   // False will disable automatic installs so you have to do it on your own.
