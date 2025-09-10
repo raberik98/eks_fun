@@ -43,3 +43,5 @@ Get ubuntu AMI
     --output table
 ```
 
+kubectl -n kube-system rollout restart deployment/ebs-csi-controller
+

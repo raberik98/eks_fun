@@ -1,5 +1,5 @@
 resource "aws_iam_role" "eks_cluster" {
-  name = "eks-cluster-role"
+  name = "${var.project_name}-eks-cluster-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -19,7 +19,7 @@ resource "aws_iam_role" "eks_cluster" {
 }
 
 resource "aws_iam_role" "eks_node" {
-  name = "eks-node-role"
+  name = "${var.project_name}-eks-node-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -35,29 +35,7 @@ resource "aws_iam_role" "eks_node" {
   })
 }
 
-// The role is for the kubernetes service account that will have the permissions granted by this role
-// # Principle of Least Privilege
-# resource "aws_iam_role" "ebs_csi" {
-#   name = "my-eks-cluster-ebs-csi-role"
 
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = "sts:AssumeRoleWithWebIdentity"
-#         Effect = "Allow"
-#         Principal = {
-#           Federated = aws_iam_openid_connect_provider.eks.arn
-#         }
-#         Condition = {
-#           StringEquals = {
-#             "${aws_iam_openid_connect_provider.eks.url}:sub" = "system:serviceaccount:kube-system:ebs-csi-controller-sa"
-#           }
-#         }
-#       }
-#     ]
-#   })
-# }
 
 resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
   role       = aws_iam_role.eks_cluster.name
@@ -89,9 +67,4 @@ resource "aws_iam_role_policy_attachment" "ecr_read_policy" {
 # resource "aws_iam_role_policy_attachment" "eks_vpc_resource_controller" {
 #   role       = aws_iam_role.eks_node.name
 #   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
-# }
-
-# resource "aws_iam_role_policy_attachment" "ebs_csi" {
-#   role       = aws_iam_role.ebs_csi.name
-#   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
 # }
