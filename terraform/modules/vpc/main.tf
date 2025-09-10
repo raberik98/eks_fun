@@ -8,32 +8,47 @@ resource "aws_vpc" "main" {
   }
 }
 
-resource "aws_subnet" "public" {
+resource "aws_subnet" "public_1" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "${var.region}a"
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "${var.project_name}-public"
+    Name = "${var.project_name}-public-1"
     "kubernetes.io/role/elb" = "1"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+  }
+}
+
+resource "aws_subnet" "public_2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "${var.region}b"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.project_name}-public-2"
+    "kubernetes.io/role/elb" = "1"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
 
 resource "aws_subnet" "private" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.2.0/24"
+  cidr_block              = "10.0.3.0/24"
   availability_zone       = "${var.region}b"
 
   tags = {
     Name = "${var.project_name}-private"
     "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
 
 resource "aws_subnet" "private_db_a" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.3.0/24"
+  cidr_block              = "10.0.4.0/24"
   availability_zone       = "${var.region}a"
 
   tags = {
@@ -43,7 +58,7 @@ resource "aws_subnet" "private_db_a" {
 
 resource "aws_subnet" "private_db_b" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.4.0/24"
+  cidr_block              = "10.0.5.0/24"
   availability_zone       = "${var.region}b"
 
   tags = {
@@ -53,7 +68,7 @@ resource "aws_subnet" "private_db_b" {
 
 resource "aws_subnet" "private_db_c" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.5.0/24"
+  cidr_block              = "10.0.6.0/24"
   availability_zone       = "${var.region}c"
 
   tags = {
@@ -75,7 +90,7 @@ resource "aws_eip" "nat" {
 
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public.id
+  subnet_id     = aws_subnet.public_1.id
 
   tags = {
     Name = "${var.project_name}-private-nat"
@@ -110,8 +125,13 @@ resource "aws_route_table" "private" {
   }
 }
 
-resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.public.id
+resource "aws_route_table_association" "public_1" {
+  subnet_id      = aws_subnet.public_1.id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table_association" "public_2" {
+  subnet_id      = aws_subnet.public_2.id
   route_table_id = aws_route_table.public.id
 }
 

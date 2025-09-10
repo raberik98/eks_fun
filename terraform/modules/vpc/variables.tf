@@ -7,3 +7,7 @@ variable "region" {
   description = "Selected region!"
   type        = string
 }
+
+variable "cluster_name" {
+  type = string
+}

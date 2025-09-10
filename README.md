@@ -45,3 +45,7 @@ Get ubuntu AMI
 
 kubectl -n kube-system rollout restart deployment/ebs-csi-controller
 
+https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
+
+https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.7/deploy/subnet_discovery/
+
