@@ -59,3 +59,4 @@ spec:
                 name: ws1-svc
                 port:
                   number: 80
+

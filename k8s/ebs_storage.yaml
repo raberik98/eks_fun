@@ -5,7 +5,7 @@ metadata:
 provisioner: ebs.csi.aws.com
 parameters:
   type: gp3
-  iops: "5000" #These are the IO operations per second that the volume can support,
-   # databases are faster when they can do more IO operations
+  iops: "5000" # These are the IO operations per second that the volume can support,
+               # databases are faster when they can do more IO operations
 allowVolumeExpansion: true
 volumeBindingMode: WaitForFirstConsumer

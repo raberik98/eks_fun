@@ -7,7 +7,6 @@ variable "region" {
 variable "profile" {
   description = "Profile for the region, likely the profile will assume a role"
   type = string
-  default = "g-36"
 }
 
 variable "project_name" {
